@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}MMORPG Board{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<nav>
+    <div class="header">
+
+        <div class="navigation">
+        <a href="{% url 'news:post_list' %}">Объявления</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'news:post_create' %}">Создать</a>
+            <a href="{% url 'news:my_comments' %}">Мои отклики</a>
+        </div>
+
+            <div class="account">
+                <p>{{ user.username }}</p>
+                <form action="{% url 'news:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Выход</button>
+                </form>
+            </div>
+
+        {% else %}
+            <div class="logout">
+                <a href="{% url 'news:login' %}">Вход</a>
+                <a href="{% url 'news:register' %}">Регистрация</a>
+            </div>
+        {% endif %}
+    </div>
+</nav>
+
+<hr>
+    <div class="main">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

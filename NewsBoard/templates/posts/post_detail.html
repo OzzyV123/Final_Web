@@ -1,0 +1,84 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<div class="detail">
+    
+    <h1>{{ post.title }}</h1>
+
+    <div class="main_detali" style="display: flex;">  
+
+        <div class="detail_title">
+            <p>Категория: {{ post.get_category_display }}</p>
+            <p>Автор: {{ post.author }}</p>
+            <div class="detail_content">
+                {{ post.content|safe }}
+            </div>
+        </div>
+
+        <div class="media">
+            {% if post.media.all %}
+
+                <h3>Вложения</h3>
+
+                {% for media in post.media.all %}
+
+                    {% if media.is_image %}
+                        <img src="{{ media.file.url }}" width="400">
+
+                    {% elif media.is_video %}
+                        <video controls width="400">
+                            <source src="{{ media.file.url }}" >
+                        </video>
+
+                    {% else %}
+                        <a href="{{ media.file.url }}">Скачать файл</a>
+                    {% endif %}
+
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        {% if user.is_authenticated and user == post.author %}
+            <p>
+                <a href="{% url 'news:post_edit' post.pk %}">
+                    Редактировать объявление
+                </a>
+            </p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>Отклики</h2>
+
+    {% if user.is_authenticated and user != post.author %}
+        <a href="{% url 'news:comment_create' post.pk %}">
+            Оставить отклик
+        </a>
+    {% endif %}
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% for comment in post.comments.all %}
+        <p>
+            {{ comment.author }}: {{ comment.content }}
+            {% if comment.is_accepted %}
+                <b>ПРИНЯТ</b>
+            {% endif %}
+        </p>
+    {% empty %}
+        <p>Откликов пока нет</p>
+    {% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<div class="titles2">
+    <div class="com_title">
+        <h1>Отклики на мои объявления</h1>
+    </div>
+    <div class="com_form">
+        <form method="get">
+            <label for="post">Фильтр по объявлению:</label>
+            <select name="post" id="post">
+                <option value="">Все</option>
+                {% for post in my_posts %}
+                    <option value="{{ post.id }}" {% if request.GET.post == post.id|stringformat:"s" %}selected{% endif %}>
+                        {{ post.title }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="status">Статус:</label>
+            <select name="status" id="status">
+                <option value="">Все</option>
+                <option value="accepted" {% if request.GET.status == 'accepted' %}selected{% endif %}>Принятые</option>
+                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Ожидают</option>
+            </select>
+
+            <button type="submit">Применить фильтр</button>
+        </form>
+    </div>
+</div>
+
+<hr>
+<div class="comments">
+    {% for comment in comments %}
+        <div class="comment {% cycle 'comment1' 'comment2' %}">
+            <div class="com_content">
+                <div class="com_content_p1">
+                    <p>
+                        Объявление:
+                        <strong>{{ comment.post.title }}</strong>
+                    </p>
+                </div>
+                <div class="com_content_p2">
+                    <p>
+                        От: {{ comment.author }} — {{ comment.content }}
+                    </p>
+                </div>
+            </div>
+            <div class="com_act">
+                {% if not comment.is_accepted %}
+                    <a href="{% url 'news:comment_accept' comment.pk %}">Принять</a>
+                {% endif %}
+                    <a href="{% url 'news:comment_delete' comment.pk %}">Удалить</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Откликов нет</p>
+    {% endfor %}
+</div>
+{% endblock %}
